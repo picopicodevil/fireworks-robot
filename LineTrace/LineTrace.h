@@ -39,7 +39,7 @@ private:
 
     Color get_color(AnalogIn pin);
 
-    static constexpr float threshold = 0.7f;
+    static constexpr float threshold = 0.6f;
 };
 
 #endif

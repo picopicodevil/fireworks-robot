@@ -13,7 +13,7 @@ void LineTrace::read()
     color[TracePosition::Center] = get_color(_center);
     color[TracePosition::Right] = get_color(_right);
 
-    if ((color[TracePosition::Left] == color[TracePosition::Center]) && (color[TracePosition::Center] == color[TracePosition::Left]) && (color[TracePosition::Right] == Color::Brack))
+    if ((color[TracePosition::Center] == Color::Brack) && (color[TracePosition::Left] == color[TracePosition::Center]) && (color[TracePosition::Center] == color[TracePosition::Left]) && (color[TracePosition::Right] == Color::Brack))
     {
         motor[Left].set_state(State::Brake);
         motor[Left].set_duty_cycle(0.00f);
@@ -23,19 +23,19 @@ void LineTrace::read()
     }
     else if (color[TracePosition::Center] == Color::Brack)
     {
-        motor[Left].set_state(State::CW);
-        motor[Left].set_duty_cycle(1.00f);
-
-        motor[Right].set_state(State::CW);
-        motor[Right].set_duty_cycle(0.50f);
-    }
-    else if (color[TracePosition::Center] == Color::Brack)
-    {
-        motor[Left].set_state(State::CW);
+        motor[Left].set_state(State::CCW);
         motor[Left].set_duty_cycle(0.50f);
 
         motor[Right].set_state(State::CW);
-        motor[Right].set_duty_cycle(1.00f);
+        motor[Right].set_duty_cycle(0.20f);
+    }
+    else if (color[TracePosition::Center] == Color::White)
+    {
+        motor[Left].set_state(State::CCW);
+        motor[Left].set_duty_cycle(0.20f);
+
+        motor[Right].set_state(State::CW);
+        motor[Right].set_duty_cycle(0.50f);
     }
 }
 
@@ -65,10 +65,10 @@ Color LineTrace::get_color(AnalogIn pin)
 
     if (value >= threshold)
     {
-        return Color::White;
+        return Color::Brack;
     }
     else
     {
-        return Color::Brack;
+        return Color::White;
     }
 }
