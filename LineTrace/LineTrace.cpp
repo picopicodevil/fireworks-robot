@@ -15,6 +15,14 @@ int LineTrace::read()
 
     if ((color[TracePosition::Center] == Color::Brack) && (color[TracePosition::Left] == color[TracePosition::Center]) && (color[TracePosition::Center] == color[TracePosition::Left]) && (color[TracePosition::Right] == Color::Brack))
     {
+        // // Up
+        // motor[Left].set_state(State::Brake);
+        // motor[Left].set_duty_cycle(0.00f);
+
+        // motor[Right].set_state(State::Brake);
+        // motor[Right].set_duty_cycle(0.00f);
+
+        // Down
         motor[Left].set_state(State::Brake);
         motor[Left].set_duty_cycle(0.00f);
 
@@ -25,21 +33,37 @@ int LineTrace::read()
     }
     else if (color[TracePosition::Center] == Color::Brack)
     {
-        motor[Left].set_state(State::CCW);
-        motor[Left].set_duty_cycle(0.50f);
+        // // Up
+        // motor[Left].set_state(State::CCW);
+        // motor[Left].set_duty_cycle(0.50f);
 
-        motor[Right].set_state(State::CW);
-        motor[Right].set_duty_cycle(0.20f);
+        // motor[Right].set_state(State::CW);
+        // motor[Right].set_duty_cycle(0.20f);
+
+        // Down
+        motor[Left].set_state(State::CW);
+        motor[Left].set_duty_cycle(0.40f);
+
+        motor[Right].set_state(State::CCW);
+        motor[Right].set_duty_cycle(0.40f);
 
         return 1;
     }
     else if (color[TracePosition::Center] == Color::White)
     {
-        motor[Left].set_state(State::CCW);
-        motor[Left].set_duty_cycle(0.20f);
+        // // Up
+        // motor[Left].set_state(State::CCW);
+        // motor[Left].set_duty_cycle(0.20f);
 
-        motor[Right].set_state(State::CW);
-        motor[Right].set_duty_cycle(0.50f);
+        // motor[Right].set_state(State::CW);
+        // motor[Right].set_duty_cycle(0.50f);
+
+        // Down
+        motor[Left].set_state(State::CW);
+        motor[Left].set_duty_cycle(0.40f);
+
+        motor[Right].set_state(State::CCW);
+        motor[Right].set_duty_cycle(0.40f);
 
         return 2;
     }
