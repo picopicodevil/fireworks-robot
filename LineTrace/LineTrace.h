@@ -22,7 +22,7 @@ public:
 
     LineTrace(PinName left, PinName center, PinName right);
 
-    void read();
+    int read();
 
     State get_left_state();
     float get_left_duty_cycle();

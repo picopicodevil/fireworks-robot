@@ -7,7 +7,7 @@ LineTrace::LineTrace(PinName left, PinName center, PinName right)
 {
 }
 
-void LineTrace::read()
+int LineTrace::read()
 {
     color[TracePosition::Left] = get_color(_left);
     color[TracePosition::Center] = get_color(_center);
@@ -20,6 +20,8 @@ void LineTrace::read()
 
         motor[Right].set_state(State::Brake);
         motor[Right].set_duty_cycle(0.00f);
+
+        return 0;
     }
     else if (color[TracePosition::Center] == Color::Brack)
     {
@@ -28,6 +30,8 @@ void LineTrace::read()
 
         motor[Right].set_state(State::CW);
         motor[Right].set_duty_cycle(0.20f);
+
+        return 1;
     }
     else if (color[TracePosition::Center] == Color::White)
     {
@@ -36,7 +40,11 @@ void LineTrace::read()
 
         motor[Right].set_state(State::CW);
         motor[Right].set_duty_cycle(0.50f);
+
+        return 2;
     }
+
+    return -1;
 }
 
 State LineTrace::get_left_state()
