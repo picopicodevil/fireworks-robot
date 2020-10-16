@@ -3,10 +3,29 @@
 #include "LineTrace.h"
 #include "IrRemoteControl.h"
 
+#define MOVE_LENGTH 2
+#define REPLACE_MOVE \
+    {                \
+        1, 3         \
+    }
+
+#define COLOR_LENGTH 2
+#define REPLACE_COLOR            \
+    {                            \
+        {0, 3, 100}, { 5, 2, 0 } \
+    }
+
+#define INITIAL_COLOR \
+    {                 \
+        195, 3, 2     \
+    }
+
 // main() runs in its own thread in the OS
 int main()
 {
     // DigitalIn pin(PF_0);
+    int move[] = REPLACE_MOVE;
+    int color[][3] = REPLACE_COLOR;
 
     IrRemoteControl controller(PF_0);
 
@@ -22,7 +41,6 @@ int main()
         led2 = !led2;
         ThisThread::sleep_for(100ms);
     }
-
 
     // while(1){
     //     int value = controller.get_reader_code();
@@ -59,7 +77,6 @@ int main()
 
         //     // ThisThread::sleep_for(700ms);
 
-
         //     // TurnLeft
         //     motor[0].set_state(State::Brake);
         //     motor[0].set_duty_cycle(0.00f);
@@ -71,6 +88,14 @@ int main()
 
         //     ThisThread::sleep_for(700ms);
         // }
+
+        if (controller.get_reader_code() == 0)
+        {
+            motor[0].set_state(State::Brake);
+            motor[0].set_duty_cycle(0.00f);
+            motor[1].set_state(State::Brake);
+            motor[1].set_duty_cycle(0.00f);
+        }
 
         motor[0].set_state(line_trace.get_left_state());
         motor[0].set_duty_cycle(line_trace.get_left_duty_cycle());
