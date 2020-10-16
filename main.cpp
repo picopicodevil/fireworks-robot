@@ -2,23 +2,7 @@
 #include "TB6612.h"
 #include "LineTrace.h"
 #include "IrRemoteControl.h"
-
-#define MOVE_LENGTH 2
-#define REPLACE_MOVE \
-    {                \
-        1, 3         \
-    }
-
-#define COLOR_LENGTH 2
-#define REPLACE_COLOR            \
-    {                            \
-        {0, 3, 100}, { 5, 2, 0 } \
-    }
-
-#define INITIAL_COLOR \
-    {                 \
-        195, 3, 2     \
-    }
+#include "UniqueValue.h"
 
 // main() runs in its own thread in the OS
 int main()
@@ -26,6 +10,8 @@ int main()
     // DigitalIn pin(PF_0);
     int move[] = REPLACE_MOVE;
     int color[][3] = REPLACE_COLOR;
+
+    int initial_color[3] = INITIAL_COLOR;
 
     IrRemoteControl controller(PF_0);
 
