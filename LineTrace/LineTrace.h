@@ -10,6 +10,12 @@ enum class Color
     White = 1,
 };
 
+enum class Place
+{
+    Base,
+    Line,
+};
+
 class LineTrace
 {
 public:
@@ -38,6 +44,7 @@ private:
     Motor motor[3]; // TracePositionの列挙型を使いたいから
 
     Color get_color(AnalogIn pin);
+    Place get_place();
 
     static constexpr float threshold = 0.6f;
 };
