@@ -5,65 +5,69 @@
 LineTrace::LineTrace(PinName left, PinName center, PinName right)
     : _left(left), _center(center), _right(right)
 {
+    _base_color = Color::Brack;
 }
 
 int LineTrace::read()
 {
-    color[TracePosition::Left] = get_color(_left);
-    color[TracePosition::Center] = get_color(_center);
-    color[TracePosition::Right] = get_color(_right);
+    _place[TracePosition::Left] = get_place(_left);
+    _place[TracePosition::Center] = get_place(_center);
+    _place[TracePosition::Right] = get_place(_right);
 
-    if ((color[TracePosition::Center] == Color::Brack) && (color[TracePosition::Left] == color[TracePosition::Center]) && (color[TracePosition::Center] == color[TracePosition::Left]) && (color[TracePosition::Right] == Color::Brack))
+    if ((_place[TracePosition::Center] == Place::Line) &&
+        (_place[TracePosition::Left] == _place[TracePosition::Center]) &&
+        (_place[TracePosition::Center] == _place[TracePosition::Left]) &&
+        (_place[TracePosition::Right] == Place::Line))
     {
         // // Up
-        // motor[Left].set_state(State::Brake);
-        // motor[Left].set_duty_cycle(0.00f);
+        _motor[Left].set_state(State::Brake);
+        _motor[Left].set_duty_cycle(0.00f);
 
-        // motor[Right].set_state(State::Brake);
-        // motor[Right].set_duty_cycle(0.00f);
+        _motor[Right].set_state(State::Brake);
+        _motor[Right].set_duty_cycle(0.00f);
 
         // Down
-        motor[Left].set_state(State::Brake);
-        motor[Left].set_duty_cycle(0.00f);
+        // _motor[Left].set_state(State::Brake);
+        // _motor[Left].set_duty_cycle(0.00f);
 
-        motor[Right].set_state(State::Brake);
-        motor[Right].set_duty_cycle(0.00f);
+        // _motor[Right].set_state(State::Brake);
+        // _motor[Right].set_duty_cycle(0.00f);
 
         return 0;
     }
-    else if (color[TracePosition::Center] == Color::Brack)
+    else if (_place[TracePosition::Center] == Place::Line)
     {
-        // // Up
-        // motor[Left].set_state(State::CCW);
-        // motor[Left].set_duty_cycle(0.50f);
+        // Up
+        _motor[Left].set_state(State::CCW);
+        _motor[Left].set_duty_cycle(0.50f);
 
-        // motor[Right].set_state(State::CW);
-        // motor[Right].set_duty_cycle(0.20f);
+        _motor[Right].set_state(State::CW);
+        _motor[Right].set_duty_cycle(0.20f);
 
         // Down
-        motor[Left].set_state(State::CW);
-        motor[Left].set_duty_cycle(0.40f);
+        // _motor[Left].set_state(State::CW);
+        // _motor[Left].set_duty_cycle(0.40f);
 
-        motor[Right].set_state(State::CCW);
-        motor[Right].set_duty_cycle(0.40f);
+        // _motor[Right].set_state(State::CCW);
+        // _motor[Right].set_duty_cycle(0.40f);
 
         return 1;
     }
-    else if (color[TracePosition::Center] == Color::White)
+    else if (_place[TracePosition::Center] == Place::Base)
     {
         // // Up
-        // motor[Left].set_state(State::CCW);
-        // motor[Left].set_duty_cycle(0.20f);
+        _motor[Left].set_state(State::CCW);
+        _motor[Left].set_duty_cycle(0.20f);
 
-        // motor[Right].set_state(State::CW);
-        // motor[Right].set_duty_cycle(0.50f);
+        _motor[Right].set_state(State::CW);
+        _motor[Right].set_duty_cycle(0.50f);
 
         // Down
-        motor[Left].set_state(State::CW);
-        motor[Left].set_duty_cycle(0.40f);
+        // _motor[Left].set_state(State::CW);
+        // _motor[Left].set_duty_cycle(0.40f);
 
-        motor[Right].set_state(State::CCW);
-        motor[Right].set_duty_cycle(0.40f);
+        // _motor[Right].set_state(State::CCW);
+        // _motor[Right].set_duty_cycle(0.40f);
 
         return 2;
     }
@@ -71,24 +75,29 @@ int LineTrace::read()
     return -1;
 }
 
+void LineTrace::set_base_color(Color color)
+{
+    _base_color = color;
+}
+
 State LineTrace::get_left_state()
 {
-    return motor[Left].get_state();
+    return _motor[Left].get_state();
 }
 
 float LineTrace::get_left_duty_cycle()
 {
-    return motor[Left].get_duty_cycle();
+    return _motor[Left].get_duty_cycle();
 }
 
 State LineTrace::get_right_state()
 {
-    return motor[Right].get_state();
+    return _motor[Right].get_state();
 }
 
 float LineTrace::get_right_duty_cycle()
 {
-    return motor[Right].get_duty_cycle();
+    return _motor[Right].get_duty_cycle();
 }
 
 Color LineTrace::get_color(AnalogIn pin)
@@ -103,4 +112,14 @@ Color LineTrace::get_color(AnalogIn pin)
     {
         return Color::White;
     }
+}
+
+Place LineTrace::get_place(AnalogIn pin)
+{
+    Color color = get_color(pin);
+
+    if (color == _base_color)
+        return Place::Base;
+    else
+        return Place::Line;
 }

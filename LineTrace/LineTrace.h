@@ -6,8 +6,8 @@
 
 enum class Color
 {
-    Brack = 0,
-    White = 1,
+    Brack,
+    White,
 };
 
 enum class Place
@@ -29,6 +29,7 @@ public:
     LineTrace(PinName left, PinName center, PinName right);
 
     int read();
+    void set_base_color(Color color);
 
     State get_left_state();
     float get_left_duty_cycle();
@@ -40,11 +41,14 @@ private:
     AnalogIn _center;
     AnalogIn _left;
 
-    Color color[3];
-    Motor motor[3]; // TracePositionの列挙型を使いたいから
+    Color _color[3];
+    Place _place[3];
+    Motor _motor[3]; // TracePositionの列挙型を使いたいから
+
+    Color _base_color;
 
     Color get_color(AnalogIn pin);
-    Place get_place();
+    Place get_place(AnalogIn pin);
 
     static constexpr float threshold = 0.6f;
 };
