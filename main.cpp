@@ -7,29 +7,9 @@
 
 #define TURN_INTERVAL_TIME 2.0f
 
-int move2value(char *move)
-{
-    if (strcmp(move, "Stay") == 0)
-        return 0;
-    else if (strcmp(move, "Up") == 0)
-        return 1;
-    else if (strcmp(move, "Left") == 0)
-        return 2;
-    else if (strcmp(move, "Down") == 0)
-        return 3;
-    else if (strcmp(move, "Right") == 0)
-        return 4;
+int move2value(char *move);
 
-    return -1;
-}
-
-void setRgbLed(DigitalOut *rgb_led, int *color)
-{
-    for (int i = 0; i < 3; i++)
-    {
-        rgb_led[i].write(color[i] > 127 ? 0 : 1);
-    }
-}
+void setRgbLed(DigitalOut *rgb_led, int *color);
 
 // main() runs in its own thread in the OS
 int main()
@@ -50,10 +30,6 @@ int main()
         DigitalOut(PB_4, 1),
     };
 
-    // rgb_led[0] = 1;
-    // rgb_led[1] = 0;
-    // rgb_led[2] = 1;
-
     for (int i = 0; controller.get_reader_code() <= 5; i++)
     {
         led = i;
@@ -65,7 +41,7 @@ int main()
     tb6612.standby(1);
 
     // 各ターンの動作
-    for (int i = 0; (i < MOVE_LENGTH) || (i < COLOR_LENGTH); i++)
+    for (int turn = 0; (turn < MOVE_LENGTH) || (turn < COLOR_LENGTH); turn++)
     {
         if (controller.get_reader_code() >= 5)
             break;
@@ -73,14 +49,14 @@ int main()
         Timer t;
         t.start();
 
-        if (i < COLOR_LENGTH)
-            setRgbLed(rgb_led, color[i]);
+        if (turn < COLOR_LENGTH)
+            setRgbLed(rgb_led, color[turn]);
 
-        led = i;
+        led = turn;
 
-        if (i < MOVE_LENGTH)
+        if (turn < MOVE_LENGTH)
         {
-            int move_value = move2value(move[i]);
+            int move_value = move2value(move[turn]);
 
             Motor motor[2];
 
@@ -174,7 +150,31 @@ int main()
     }
 
     tb6612.standby(0);
-    rgb_led[0] = rgb_led[1] = rgb_led[2] = 1;
+    // rgb_led[0] = rgb_led[1] = rgb_led[2] = 1;
     led = 0;
     sleep();
+}
+
+int move2value(char *move)
+{
+    if (strcmp(move, "Stay") == 0)
+        return 0;
+    else if (strcmp(move, "Up") == 0)
+        return 1;
+    else if (strcmp(move, "Left") == 0)
+        return 2;
+    else if (strcmp(move, "Down") == 0)
+        return 3;
+    else if (strcmp(move, "Right") == 0)
+        return 4;
+
+    return -1;
+}
+
+void setRgbLed(DigitalOut *rgb_led, int *color)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        rgb_led[i].write(color[i] > 127 ? 0 : 1);
+    }
 }

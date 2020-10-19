@@ -19,55 +19,32 @@ int LineTrace::read()
         (_place[TracePosition::Right] == Place::Line)))
     {
         // 中央と、左右のいずれかがライン上に乗った時（歩留まり向上のため）
-        // // Up
+
         _motor[Left].set_state(State::Brake);
         _motor[Left].set_duty_cycle(0.00f);
 
         _motor[Right].set_state(State::Brake);
         _motor[Right].set_duty_cycle(0.00f);
 
-        // Down
-        // _motor[Left].set_state(State::Brake);
-        // _motor[Left].set_duty_cycle(0.00f);
-
-        // _motor[Right].set_state(State::Brake);
-        // _motor[Right].set_duty_cycle(0.00f);
-
         return 0;
     }
     else if (_place[TracePosition::Center] == Place::Line)
     {
-        // Up
         _motor[Left].set_state(State::CCW);
         _motor[Left].set_duty_cycle(0.50f);
 
         _motor[Right].set_state(State::CW);
         _motor[Right].set_duty_cycle(0.20f);
 
-        // Down
-        // _motor[Left].set_state(State::CW);
-        // _motor[Left].set_duty_cycle(0.40f);
-
-        // _motor[Right].set_state(State::CCW);
-        // _motor[Right].set_duty_cycle(0.40f);
-
         return 1;
     }
     else if (_place[TracePosition::Center] == Place::Base)
     {
-        // // Up
         _motor[Left].set_state(State::CCW);
         _motor[Left].set_duty_cycle(0.20f);
 
         _motor[Right].set_state(State::CW);
         _motor[Right].set_duty_cycle(0.50f);
-
-        // Down
-        // _motor[Left].set_state(State::CW);
-        // _motor[Left].set_duty_cycle(0.40f);
-
-        // _motor[Right].set_state(State::CCW);
-        // _motor[Right].set_duty_cycle(0.40f);
 
         return 2;
     }
