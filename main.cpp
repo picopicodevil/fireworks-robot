@@ -3,7 +3,6 @@
 #include "LineTrace.h"
 #include "IrRemoteControl.h"
 #include "UniqueValue.h"
-#include <chrono>
 #include <cstring>
 
 #define TURN_INTERVAL_TIME 2.0f
@@ -55,18 +54,11 @@ int main()
     // rgb_led[1] = 0;
     // rgb_led[2] = 1;
 
-    // int i = 0;
-    // while(1){
-    //     led = i++;
-    //     ThisThread::sleep_for(1s);
-    // }
-
-    // while (controller.get_reader_code() >= 5)
-    // {
-    //     led1 = !led1;
-    //     led2 = !led2;
-    //     ThisThread::sleep_for(100ms);
-    // }
+    for (int i = 0; controller.get_reader_code() <= 5; i++)
+    {
+        led = i;
+        ThisThread::sleep_for(10ms);
+    }
 
     controller.reset_reader_code();
 
@@ -75,6 +67,9 @@ int main()
     // 各ターンの動作
     for (int i = 0; (i < MOVE_LENGTH) || (i < COLOR_LENGTH); i++)
     {
+        if (controller.get_reader_code() >= 5)
+            break;
+
         Timer t;
         t.start();
 
@@ -82,12 +77,6 @@ int main()
             setRgbLed(rgb_led, color[i]);
 
         led = i;
-
-        if (controller.get_reader_code() >= 5)
-            break;
-
-        // @TODO ここで直進、後進、右折、左折のコードを記述する
-        // int result = line_trace.read();
 
         if (i < MOVE_LENGTH)
         {
@@ -161,6 +150,7 @@ int main()
             }
         }
 
+        // ライントレース(直進)のコード
         while ((controller.get_reader_code() <= 5) &&
                (t.read() < TURN_INTERVAL_TIME))
         {
@@ -185,5 +175,6 @@ int main()
 
     tb6612.standby(0);
     rgb_led[0] = rgb_led[1] = rgb_led[2] = 1;
+    led = 0;
     sleep();
 }
