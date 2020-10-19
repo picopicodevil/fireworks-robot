@@ -44,9 +44,7 @@ int main()
     IrRemoteControl controller(PF_0);
     TB6612 tb6612(PA_5, PA_4, PA_8, PA_7, PB_0, PB_1, PA_6);
     LineTrace line_trace(PA_0, PA_1, PA_3);
-
     BusOut led(PB_6, PB_7);
-
     DigitalOut rgb_led[] = {
         DigitalOut(PB_5, 1),
         DigitalOut(PB_3, 1),
@@ -83,8 +81,6 @@ int main()
         if (i < COLOR_LENGTH)
             setRgbLed(rgb_led, color[i]);
 
-        Motor motor[2];
-
         led = i;
 
         if (controller.get_reader_code() >= 5)
@@ -97,25 +93,23 @@ int main()
         {
             int move_value = move2value(move[i]);
 
+            Motor motor[2];
+
             switch (move_value)
             {
             case 0:
                 // Stay
-                while (1)
+                while ((controller.get_reader_code() <= 5) &&
+                       (t.read() < TURN_INTERVAL_TIME))
                 {
-                    if (controller.get_reader_code() >= 5)
-                        break;
-
-                    if (t.read() > TURN_INTERVAL_TIME)
-                        break;
-
-                    ThisThread::sleep_for(100ms);
+                    ThisThread::sleep_for(10ms);
                 }
                 break;
             case 2:
-                // // TurnRight
+                // // Turn right
                 motor[0].set_state(State::CCW);
                 motor[0].set_duty_cycle(0.50f);
+
                 motor[1].set_state(State::CCW);
                 motor[1].set_duty_cycle(0.20f);
 
@@ -124,11 +118,35 @@ int main()
 
                 ThisThread::sleep_for(700ms);
                 break;
+            case 3:
+                // Down
+                while ((line_trace.read() != 0) &&
+                       (controller.get_reader_code() <= 5) &&
+                       (t.read() < TURN_INTERVAL_TIME))
+                {
+                    motor[0].set_state(State::CW);
+                    motor[0].set_duty_cycle(0.40f);
+
+                    motor[1].set_state(State::CCW);
+                    motor[1].set_duty_cycle(0.40f);
+
+                    ThisThread::sleep_for(10ms);
+                }
+
+                motor[0].set_state(State::Brake);
+                motor[0].set_duty_cycle(0.00f);
+
+                motor[1].set_state(State::Brake);
+                motor[1].set_duty_cycle(0.00f);
+
+                while (t.read() < TURN_INTERVAL_TIME)
+                    ThisThread::sleep_for(10ms);
 
             case 4:
-                // turn left
+                // Turn left
                 motor[0].set_state(State::CW);
-                motor[0].set_duty_cycle(0.020f);
+                motor[0].set_duty_cycle(0.00f);
+
                 motor[1].set_state(State::CW);
                 motor[1].set_duty_cycle(0.50f);
 
@@ -143,18 +161,15 @@ int main()
             }
         }
 
-        while (true)
+        while ((controller.get_reader_code() <= 5) &&
+               (t.read() < TURN_INTERVAL_TIME))
         {
-            if (controller.get_reader_code() >= 5)
-                break;
+            line_trace.read();
 
-            printf("%f", t.read());
-
-            if (t.read() > TURN_INTERVAL_TIME)
-                break;
-
+            Motor motor[2];
             motor[0].set_state(line_trace.get_left_state());
             motor[0].set_duty_cycle(line_trace.get_left_duty_cycle());
+
             motor[1].set_state(line_trace.get_right_state());
             motor[1].set_duty_cycle(line_trace.get_right_duty_cycle());
 
