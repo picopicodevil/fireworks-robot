@@ -155,7 +155,12 @@ void check_line_trace()
     line_trace.set_base_color(Color::Brack);
 
     BusOut led(PB_6, PB_7);
-    led = line_trace.read();
+
+    while (1)
+    {
+        led = line_trace.read();
+        ThisThread::sleep_for(10ms);
+    }
 }
 
 void check_sps440()
