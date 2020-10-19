@@ -23,6 +23,9 @@ int main()
 
     pc.write("\n\nSTART\n", 8);
 
+    pc.write("IR\n", 3);
+    check_sps440();
+
     pc.write("RGB\n", 4);
     check_rgb_led();
 
@@ -34,9 +37,6 @@ int main()
 
     pc.write("LINE\n", 5);
     check_line_trace();
-
-    pc.write("IR\n", 3);
-    check_sps440();
 
     pc.write("FINISH\n", 6);
     sleep();
@@ -107,7 +107,7 @@ void check_md()
 
     Motor motor[2];
 
-    for (float duty_cycle = 0.0f; duty_cycle <= 0.70f; duty_cycle += 0.035f)
+    for (float duty_cycle = 0.0f; duty_cycle <= 0.70f; duty_cycle += 0.005f)
     {
         motor[0].set_state(State::CW);
         motor[0].set_duty_cycle(duty_cycle);
@@ -129,7 +129,7 @@ void check_md()
     tb6612.set(motor[1], 1);
     ThisThread::sleep_for(510ms);
 
-    for (float duty_cycle = 0.0f; duty_cycle <= 0.70f; duty_cycle += 0.035f)
+    for (float duty_cycle = 0.0f; duty_cycle <= 0.70f; duty_cycle += 0.005f)
     {
         motor[0].set_state(State::CCW);
         motor[0].set_duty_cycle(duty_cycle);
@@ -142,9 +142,15 @@ void check_md()
         ThisThread::sleep_for(10ms);
     }
 
+    motor[0].set_state(State::Brake);
+    motor[0].set_duty_cycle(0.0f);
+    motor[1].set_state(State::Brake);
+    motor[1].set_duty_cycle(0.0f);
+
     tb6612.set(motor[0], 0);
     tb6612.set(motor[1], 1);
     ThisThread::sleep_for(510ms);
+
     tb6612.standby(0);
 }
 

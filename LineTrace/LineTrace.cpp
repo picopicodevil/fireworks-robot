@@ -34,7 +34,7 @@ int LineTrace::read()
 
         return 0;
     }
-    else if (_place[TracePosition::Center] == Place::Line)
+    else if (_place[TracePosition::Right] == Place::Line)
     {
         // Up
         _motor[Left].set_state(State::CCW);
@@ -52,7 +52,7 @@ int LineTrace::read()
 
         return 1;
     }
-    else if (_place[TracePosition::Center] == Place::Base)
+    else if (_place[TracePosition::Right] == Place::Base)
     {
         // // Up
         _motor[Left].set_state(State::CCW);
