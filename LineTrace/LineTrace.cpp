@@ -15,8 +15,7 @@ int LineTrace::read()
     _place[TracePosition::Right] = get_place(_right);
 
     if ((_place[TracePosition::Center] == Place::Line) &&
-        (_place[TracePosition::Left] == _place[TracePosition::Center]) &&
-        (_place[TracePosition::Center] == _place[TracePosition::Left]) &&
+        (_place[TracePosition::Left] == Place::Line) &&
         (_place[TracePosition::Right] == Place::Line))
     {
         // // Up
