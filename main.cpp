@@ -58,21 +58,20 @@ int main()
 
         if (turn < MOVE_LENGTH)
         {
-            int move_value = move2value(move[turn]);
-
             Motor motor[2];
 
-            switch (move_value)
+            switch (move2value(move[turn]))
             {
             case 0:
                 // Stay
                 while ((controller.get_reader_code() <= 5) &&
-                       (t.read() < TURN_INTERVAL_TIME))
+                       (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
                 {
                     ThisThread::sleep_for(10ms);
                 }
                 break;
             case 1:
+                // Up
                 motor[0].set_state(State::CCW);
                 motor[0].set_duty_cycle(0.40f);
 
@@ -101,7 +100,7 @@ int main()
                 // Down
                 while ((line_trace.read() != 0) &&
                        (controller.get_reader_code() <= 5) &&
-                       (t.read() < TURN_INTERVAL_TIME))
+                       (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
                 {
                     motor[0].set_state(State::CW);
                     motor[0].set_duty_cycle(0.40f);
@@ -124,7 +123,8 @@ int main()
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
 
-                while (t.read() < TURN_INTERVAL_TIME)
+                while ((controller.get_reader_code() <= 5) &&
+                       (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
                     ThisThread::sleep_for(10ms);
 
             case 4:
@@ -148,7 +148,7 @@ int main()
 
         // ライントレース(直進)のコード
         while ((controller.get_reader_code() <= 5) &&
-               (t.read() < TURN_INTERVAL_TIME))
+               (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
         {
             line_trace.read();
 
@@ -170,8 +170,11 @@ int main()
     }
 
     tb6612.standby(0);
-    rgb_led[0] = rgb_led[1] = rgb_led[2] = 1;
     led = 3;
+
+    if (controller.get_reader_code() >= 5)
+        rgb_led[0] = rgb_led[1] = rgb_led[2] = 1;
+
     sleep();
 }
 
