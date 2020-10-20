@@ -5,7 +5,7 @@
 #include "UniqueValue.h"
 #include <cstring>
 
-#define TURN_INTERVAL_TIME 2.0f
+#define TURN_INTERVAL_TIME 5.0f
 
 int move2value(char *move);
 
@@ -29,6 +29,8 @@ int main()
         DigitalOut(PB_3, 1),
         DigitalOut(PB_4, 1),
     };
+
+    line_trace.set_base_color(Color::Brack);
 
     for (int i = 0; controller.get_reader_code() <= 5; i++)
     {
@@ -70,13 +72,25 @@ int main()
                     ThisThread::sleep_for(10ms);
                 }
                 break;
-            case 2:
-                // // Turn right
+            case 1:
                 motor[0].set_state(State::CCW);
-                motor[0].set_duty_cycle(0.50f);
+                motor[0].set_duty_cycle(0.40f);
 
-                motor[1].set_state(State::CCW);
-                motor[1].set_duty_cycle(0.20f);
+                motor[1].set_state(State::CW);
+                motor[1].set_duty_cycle(0.40f);
+
+                tb6612.set(motor[0], 0);
+                tb6612.set(motor[1], 1);
+
+                ThisThread::sleep_for(200ms);
+                break;
+            case 2:
+                // Turn left
+                motor[0].set_state(State::CW);
+                motor[0].set_duty_cycle(0.00f);
+
+                motor[1].set_state(State::CW);
+                motor[1].set_duty_cycle(0.50f);
 
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
@@ -95,6 +109,9 @@ int main()
                     motor[1].set_state(State::CCW);
                     motor[1].set_duty_cycle(0.40f);
 
+                    tb6612.set(motor[0], 0);
+                    tb6612.set(motor[1], 1);
+
                     ThisThread::sleep_for(10ms);
                 }
 
@@ -104,16 +121,19 @@ int main()
                 motor[1].set_state(State::Brake);
                 motor[1].set_duty_cycle(0.00f);
 
+                tb6612.set(motor[0], 0);
+                tb6612.set(motor[1], 1);
+
                 while (t.read() < TURN_INTERVAL_TIME)
                     ThisThread::sleep_for(10ms);
 
             case 4:
-                // Turn left
-                motor[0].set_state(State::CW);
-                motor[0].set_duty_cycle(0.00f);
+                // // Turn right
+                motor[0].set_state(State::CCW);
+                motor[0].set_duty_cycle(0.50f);
 
-                motor[1].set_state(State::CW);
-                motor[1].set_duty_cycle(0.50f);
+                motor[1].set_state(State::CCW);
+                motor[1].set_duty_cycle(0.20f);
 
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
@@ -150,8 +170,8 @@ int main()
     }
 
     tb6612.standby(0);
-    // rgb_led[0] = rgb_led[1] = rgb_led[2] = 1;
-    led = 0;
+    rgb_led[0] = rgb_led[1] = rgb_led[2] = 1;
+    led = 3;
     sleep();
 }
 

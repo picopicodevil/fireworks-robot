@@ -50,7 +50,7 @@ private:
     Color get_color(AnalogIn pin);
     Place get_place(AnalogIn pin);
 
-    static constexpr float threshold = 0.5f;
+    static constexpr float threshold = 0.85f;
 };
 
 #endif
