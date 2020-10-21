@@ -35,6 +35,8 @@ public:
     float get_left_duty_cycle();
     State get_right_state();
     float get_right_duty_cycle();
+    
+    void set_threshold(float value);
 
 private:
     AnalogIn _right;
@@ -47,10 +49,10 @@ private:
 
     Color _base_color;
 
+    float _threshold;
+
     Color get_color(AnalogIn pin);
     Place get_place(AnalogIn pin);
-
-    static constexpr float threshold = 0.85f;
 };
 
 #endif

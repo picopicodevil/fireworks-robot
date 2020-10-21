@@ -31,6 +31,7 @@ int main()
     };
 
     line_trace.set_base_color(Color::Brack);
+    line_trace.set_threshold(COLOR_THRESHOLD);
 
     for (int i = 0; controller.get_reader_code() <= 5; i++)
     {
@@ -58,7 +59,7 @@ int main()
 
         if (turn < MOVE_LENGTH)
         {
-            // index 0 -> 電源側, 1 -> センサコネクタ側
+            // index 0 -> 電源側(左), 1 -> センサコネクタ側(右)
             Motor motor[2];
 
             switch (move2value(move[turn]))
@@ -87,15 +88,15 @@ int main()
             case 2:
                 // Turn left
                 motor[0].set_state(State::CW);
-                motor[0].set_duty_cycle(0.00f);
+                motor[0].set_duty_cycle(TURN_LEFT_WHEEL_LEFT_PWM);
 
                 motor[1].set_state(State::CW);
-                motor[1].set_duty_cycle(0.50f);
+                motor[1].set_duty_cycle(TURN_LEFT_WHEEL_RIGHT_PWM);
 
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
 
-                ThisThread::sleep_for(700ms);
+                ThisThread::sleep_for(TURN_LEFT_SLEEP_MS);
                 break;
             case 3:
                 // Down
@@ -131,15 +132,15 @@ int main()
             case 4:
                 // // Turn right
                 motor[0].set_state(State::CCW);
-                motor[0].set_duty_cycle(0.50f);
+                motor[0].set_duty_cycle(TURN_RIGHT_WHEEL_LEFT_PWM);
 
-                motor[1].set_state(State::Brake);
-                motor[1].set_duty_cycle(0.00f);
+                motor[1].set_state(State::CCW);
+                motor[1].set_duty_cycle(TURN_RIGHT_WHEEL_RIGHT_PWM);
 
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
 
-                ThisThread::sleep_for(700ms);
+                ThisThread::sleep_for(TURN_RIGHT_SLEEP_MS);
                 break;
 
             default:

@@ -6,6 +6,7 @@ LineTrace::LineTrace(PinName left, PinName center, PinName right)
     : _left(left), _center(center), _right(right)
 {
     _base_color = Color::Brack;
+    _threshold = 0.85f;
 }
 
 int LineTrace::read()
@@ -57,6 +58,11 @@ void LineTrace::set_base_color(Color color)
     _base_color = color;
 }
 
+void LineTrace::set_threshold(float value)
+{
+    _threshold = value;
+}
+
 State LineTrace::get_left_state()
 {
     return _motor[Left].get_state();
@@ -81,7 +87,7 @@ Color LineTrace::get_color(AnalogIn pin)
 {
     float value = pin.read();
 
-    if (value >= threshold)
+    if (value >= _threshold)
     {
         return Color::Brack;
     }
