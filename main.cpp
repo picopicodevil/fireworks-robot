@@ -58,6 +58,7 @@ int main()
 
         if (turn < MOVE_LENGTH)
         {
+            // index 0 -> 電源側, 1 -> センサコネクタ側
             Motor motor[2];
 
             switch (move2value(move[turn]))
@@ -132,8 +133,8 @@ int main()
                 motor[0].set_state(State::CCW);
                 motor[0].set_duty_cycle(0.50f);
 
-                motor[1].set_state(State::CCW);
-                motor[1].set_duty_cycle(0.20f);
+                motor[1].set_state(State::Brake);
+                motor[1].set_duty_cycle(0.00f);
 
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
