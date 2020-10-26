@@ -5,7 +5,7 @@
 #include "UniqueValue.h"
 #include <cstring>
 
-#define TURN_INTERVAL_TIME 5.0f
+#define TURN_INTERVAL_TIME 3.0f
 
 int move2value(char *move);
 
