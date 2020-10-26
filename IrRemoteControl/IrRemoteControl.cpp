@@ -18,7 +18,7 @@ void IrRemoteControl::timer_stop()
 {
     _timer.stop();
     unsigned int ms = std::chrono::duration_cast<std::chrono::milliseconds>(_timer.elapsed_time()).count();
-    if ((8 <= ms) && (ms <= 10))
+    if ((4 <= ms) && (ms <= 10))
     {
         _get_reader_code++;
     }
