@@ -7,6 +7,10 @@
 
 #define TURN_INTERVAL_TIME 3.0f
 
+#define START_COUNT 5
+#define STOP_COUNT 20
+
+void wheel_straight(LineTrace &line_trace, TB6612 &tb6612);
 int move2value(char *move);
 
 void setRgbLed(DigitalOut *rgb_led, int *color);
@@ -33,7 +37,7 @@ int main()
     line_trace.set_base_color(Color::Brack);
     line_trace.set_threshold(COLOR_THRESHOLD);
 
-    for (int i = 0; controller.get_reader_code() <= 5; i++)
+    for (int i = 0; controller.get_reader_code() <= START_COUNT; i++)
     {
         led = i;
         ThisThread::sleep_for(10ms);
@@ -46,7 +50,7 @@ int main()
     // 各ターンの動作
     for (int turn = 0; (turn < MOVE_LENGTH) || (turn < COLOR_LENGTH); turn++)
     {
-        if (controller.get_reader_code() >= 5)
+        if (controller.get_reader_code() >= STOP_COUNT)
             break;
 
         Timer t;
@@ -66,7 +70,7 @@ int main()
             {
             case 0:
                 // Stay
-                while ((controller.get_reader_code() <= 5) &&
+                while ((controller.get_reader_code() <= STOP_COUNT) &&
                        (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
                 {
                     ThisThread::sleep_for(10ms);
@@ -101,7 +105,7 @@ int main()
             case 3:
                 // Down
                 while ((line_trace.read() != 0) &&
-                       (controller.get_reader_code() <= 5) &&
+                       (controller.get_reader_code() <= STOP_COUNT) &&
                        (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
                 {
                     motor[0].set_state(State::CW);
@@ -125,7 +129,7 @@ int main()
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
 
-                while ((controller.get_reader_code() <= 5) &&
+                while ((controller.get_reader_code() <= STOP_COUNT) &&
                        (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
                     ThisThread::sleep_for(10ms);
 
@@ -148,18 +152,33 @@ int main()
             }
         }
 
+        bool is_arrived = false;
+
         // ライントレース(直進)のコード
-        while ((controller.get_reader_code() <= 5) &&
+        while ((controller.get_reader_code() <= STOP_COUNT) &&
                (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
         {
-            line_trace.read();
+            if (line_trace.read() == 0)
+                is_arrived = true;
 
             Motor motor[2];
-            motor[0].set_state(line_trace.get_left_state());
-            motor[0].set_duty_cycle(line_trace.get_left_duty_cycle());
 
-            motor[1].set_state(line_trace.get_right_state());
-            motor[1].set_duty_cycle(line_trace.get_right_duty_cycle());
+            if (is_arrived == true)
+            {
+                motor[0].set_state(State::Brake);
+                motor[0].set_duty_cycle(0.00f);
+
+                motor[1].set_state(State::Brake);
+                motor[1].set_duty_cycle(0.00f);
+            }
+            else
+            {
+                motor[0].set_state(line_trace.get_left_state());
+                motor[0].set_duty_cycle(line_trace.get_left_duty_cycle());
+
+                motor[1].set_state(line_trace.get_right_state());
+                motor[1].set_duty_cycle(line_trace.get_right_duty_cycle());
+            }
 
             tb6612.set(motor[0], 0);
             tb6612.set(motor[1], 1);
@@ -174,10 +193,27 @@ int main()
     tb6612.standby(0);
     led = 3;
 
-    if (controller.get_reader_code() >= 5)
+    if (controller.get_reader_code() >= STOP_COUNT)
         rgb_led[0] = rgb_led[1] = rgb_led[2] = 1;
 
     sleep();
+}
+
+void wheel_straight(LineTrace &line_trace, TB6612 &tb6612)
+{
+    line_trace.read();
+
+    Motor motor[2];
+    motor[0].set_state(line_trace.get_left_state());
+    motor[0].set_duty_cycle(line_trace.get_left_duty_cycle());
+
+    motor[1].set_state(line_trace.get_right_state());
+    motor[1].set_duty_cycle(line_trace.get_right_duty_cycle());
+
+    tb6612.set(motor[0], 0);
+    tb6612.set(motor[1], 1);
+
+    ThisThread::sleep_for(10ms);
 }
 
 int move2value(char *move)
