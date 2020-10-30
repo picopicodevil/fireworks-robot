@@ -8,7 +8,7 @@
 #define TURN_INTERVAL_TIME 3.0f
 
 #define START_COUNT 5
-#define STOP_COUNT 20
+#define STOP_COUNT 12
 
 void wheel_straight(LineTrace &line_trace, TB6612 &tb6612);
 int move2value(char *move);
@@ -66,6 +66,8 @@ int main()
             // index 0 -> 電源側(左), 1 -> センサコネクタ側(右)
             Motor motor[2];
 
+            int line_count = 0;
+
             switch (move2value(move[turn]))
             {
             case 0:
@@ -100,8 +102,21 @@ int main()
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
 
-                ThisThread::sleep_for(TURN_LEFT_SLEEP_MS);
+                // ThisThread::sleep_for(TURN_LEFT_SLEEP_MS);
+
+                ThisThread::sleep_for(300ms);
+
+                while ((line_count <= 5) &&
+                       (controller.get_reader_code() <= STOP_COUNT))
+                {
+                    if (line_trace.read() == 1)
+                        line_count++;
+
+                    ThisThread::sleep_for(5ms);
+                }
+
                 break;
+
             case 3:
                 // Down
                 while ((line_trace.read() != 0) &&
@@ -144,7 +159,19 @@ int main()
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
 
-                ThisThread::sleep_for(TURN_RIGHT_SLEEP_MS);
+                // ThisThread::sleep_for(TURN_RIGHT_SLEEP_MS);
+
+                ThisThread::sleep_for(300ms);
+
+                while ((line_count <= 5) &&
+                       (controller.get_reader_code() <= STOP_COUNT))
+                {
+                    if (line_trace.read() == 1)
+                        line_count++;
+
+                    ThisThread::sleep_for(5ms);
+                }
+
                 break;
 
             default:
