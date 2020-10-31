@@ -9,7 +9,7 @@
 
 #define COMPETITION_TIME 120.0f
 
-#define START_COUNT 5
+#define START_COUNT 3
 #define STOP_COUNT 200
 
 void wheel_straight(LineTrace &line_trace, TB6612 &tb6612);
