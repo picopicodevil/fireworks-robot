@@ -121,6 +121,11 @@ int main()
                     if (line_trace.read() == 1)
                         line_count++;
 
+                    if (std::chrono::duration<float>{turn_timer.elapsed_time()}.count() > TURN_INTERVAL_TIME) {
+                        while(1)
+                            sleep();
+                    }
+
                     ThisThread::sleep_for(5ms);
                 }
 
@@ -176,6 +181,11 @@ int main()
                     if (line_trace.read() == 1)
                         line_count++;
 
+                    if (std::chrono::duration<float>{turn_timer.elapsed_time()}.count() > TURN_INTERVAL_TIME) {
+                        while(1)
+                            sleep();
+                    }
+
                     ThisThread::sleep_for(5ms);
                 }
 
@@ -185,6 +195,11 @@ int main()
                 {
                     if (line_trace.read() == 2)
                         line_count++;
+
+                    if (std::chrono::duration<float>{turn_timer.elapsed_time()}.count() > TURN_INTERVAL_TIME) {
+                        while(1)
+                            sleep();
+                    }
 
                     ThisThread::sleep_for(5ms);
                 }
