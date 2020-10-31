@@ -70,7 +70,7 @@ int main()
         if (turn < COLOR_LENGTH)
             setRgbLed(rgb_led, color[turn]);
 
-        led = turn;
+        // led = turn;
 
         if (turn < MOVE_LENGTH)
         {
