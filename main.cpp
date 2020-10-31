@@ -7,6 +7,8 @@
 
 #define TURN_INTERVAL_TIME 2.0f
 
+#define COMPETITION_TIME 120.0f
+
 #define START_COUNT 5
 #define STOP_COUNT 200
 
@@ -47,14 +49,23 @@ int main()
 
     tb6612.standby(1);
 
+    Timer all_timer;
+
+    all_timer.start();
+
     // 各ターンの動作
     for (int turn = 0; (turn < MOVE_LENGTH) || (turn < COLOR_LENGTH); turn++)
     {
         // if (controller.get_reader_code() >= STOP_COUNT)
         //     break;
 
-        Timer t;
-        t.start();
+        if (std::chrono::duration<float>{all_timer.elapsed_time()}.count() >= COMPETITION_TIME)
+        {
+            break;
+        }
+
+        Timer turn_timer;
+        turn_timer.start();
 
         if (turn < COLOR_LENGTH)
             setRgbLed(rgb_led, color[turn]);
@@ -72,9 +83,9 @@ int main()
             {
             case 0:
                 // Stay
-                while (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME)
-                {
-                    ThisThread::sleep_for(10ms);
+                while (std::chrono::duration<float>{turn_timer.elapsed_time()}
+                           .count() < TURN_INTERVAL_TIME) {
+                  ThisThread::sleep_for(10ms);
                 }
                 break;
             case 1:
@@ -118,18 +129,18 @@ int main()
             case 3:
                 // Down
                 while ((line_trace.read() != 0) &&
-                       (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
-                {
-                    motor[0].set_state(State::CW);
-                    motor[0].set_duty_cycle(0.40f);
+                       (std::chrono::duration<float>{turn_timer.elapsed_time()}
+                            .count() < TURN_INTERVAL_TIME)) {
+                  motor[0].set_state(State::CW);
+                  motor[0].set_duty_cycle(0.40f);
 
-                    motor[1].set_state(State::CCW);
-                    motor[1].set_duty_cycle(0.40f);
+                  motor[1].set_state(State::CCW);
+                  motor[1].set_duty_cycle(0.40f);
 
-                    tb6612.set(motor[0], 0);
-                    tb6612.set(motor[1], 1);
+                  tb6612.set(motor[0], 0);
+                  tb6612.set(motor[1], 1);
 
-                    ThisThread::sleep_for(10ms);
+                  ThisThread::sleep_for(10ms);
                 }
 
                 motor[0].set_state(State::Brake);
@@ -141,8 +152,9 @@ int main()
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
 
-                while (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME)
-                    ThisThread::sleep_for(10ms);
+                while (std::chrono::duration<float>{turn_timer.elapsed_time()}
+                           .count() < TURN_INTERVAL_TIME)
+                  ThisThread::sleep_for(10ms);
 
             case 4:
                 // // Turn right
@@ -187,38 +199,35 @@ int main()
         bool is_arrived = false;
 
         // ライントレース(直進)のコード
-        while (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME)
-        {
-            if (line_trace.read() == 0)
-                is_arrived = true;
+        while (std::chrono::duration<float>{turn_timer.elapsed_time()}.count() <
+               TURN_INTERVAL_TIME) {
+          if (line_trace.read() == 0)
+            is_arrived = true;
 
-            Motor motor[2];
+          Motor motor[2];
 
-            if (is_arrived == true)
-            {
-                motor[0].set_state(State::Brake);
-                motor[0].set_duty_cycle(0.00f);
+          if (is_arrived == true) {
+            motor[0].set_state(State::Brake);
+            motor[0].set_duty_cycle(0.00f);
 
-                motor[1].set_state(State::Brake);
-                motor[1].set_duty_cycle(0.00f);
-            }
-            else
-            {
-                motor[0].set_state(line_trace.get_left_state());
-                motor[0].set_duty_cycle(line_trace.get_left_duty_cycle());
+            motor[1].set_state(State::Brake);
+            motor[1].set_duty_cycle(0.00f);
+          } else {
+            motor[0].set_state(line_trace.get_left_state());
+            motor[0].set_duty_cycle(line_trace.get_left_duty_cycle());
 
-                motor[1].set_state(line_trace.get_right_state());
-                motor[1].set_duty_cycle(line_trace.get_right_duty_cycle());
-            }
+            motor[1].set_state(line_trace.get_right_state());
+            motor[1].set_duty_cycle(line_trace.get_right_duty_cycle());
+          }
 
-            tb6612.set(motor[0], 0);
-            tb6612.set(motor[1], 1);
+          tb6612.set(motor[0], 0);
+          tb6612.set(motor[1], 1);
 
-            ThisThread::sleep_for(10ms);
+          ThisThread::sleep_for(10ms);
         }
 
-        t.stop();
-        t.reset();
+        turn_timer.stop();
+        turn_timer.reset();
     }
 
     tb6612.standby(0);
