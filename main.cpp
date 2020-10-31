@@ -8,7 +8,7 @@
 #define TURN_INTERVAL_TIME 2.0f
 
 #define START_COUNT 5
-#define STOP_COUNT 12
+#define STOP_COUNT 200
 
 void wheel_straight(LineTrace &line_trace, TB6612 &tb6612);
 int move2value(char *move);
@@ -37,11 +37,11 @@ int main()
     line_trace.set_base_color(Color::Brack);
     line_trace.set_threshold(COLOR_THRESHOLD);
 
-    for (int i = 0; controller.get_reader_code() <= START_COUNT; i++)
-    {
-        led = i;
-        ThisThread::sleep_for(10ms);
-    }
+     for (int i = 0; controller.get_reader_code() <= START_COUNT; i++)
+     {
+         led = i;
+         ThisThread::sleep_for(10ms);
+     }
 
     controller.reset_reader_code();
 
@@ -50,8 +50,8 @@ int main()
     // 各ターンの動作
     for (int turn = 0; (turn < MOVE_LENGTH) || (turn < COLOR_LENGTH); turn++)
     {
-        if (controller.get_reader_code() >= STOP_COUNT)
-            break;
+        // if (controller.get_reader_code() >= STOP_COUNT)
+        //     break;
 
         Timer t;
         t.start();
@@ -72,8 +72,7 @@ int main()
             {
             case 0:
                 // Stay
-                while ((controller.get_reader_code() <= STOP_COUNT) &&
-                       (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
+                while (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME)
                 {
                     ThisThread::sleep_for(10ms);
                 }
@@ -104,10 +103,9 @@ int main()
 
                 // ThisThread::sleep_for(TURN_LEFT_SLEEP_MS);
 
-                ThisThread::sleep_for(300ms);
+                ThisThread::sleep_for(400ms);
 
-                while ((line_count <= 5) &&
-                       (controller.get_reader_code() <= STOP_COUNT))
+                while (line_count <= 5)
                 {
                     if (line_trace.read() == 1)
                         line_count++;
@@ -120,7 +118,6 @@ int main()
             case 3:
                 // Down
                 while ((line_trace.read() != 0) &&
-                       (controller.get_reader_code() <= STOP_COUNT) &&
                        (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
                 {
                     motor[0].set_state(State::CW);
@@ -144,8 +141,7 @@ int main()
                 tb6612.set(motor[0], 0);
                 tb6612.set(motor[1], 1);
 
-                while ((controller.get_reader_code() <= STOP_COUNT) &&
-                       (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
+                while (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME)
                     ThisThread::sleep_for(10ms);
 
             case 4:
@@ -161,12 +157,21 @@ int main()
 
                 // ThisThread::sleep_for(TURN_RIGHT_SLEEP_MS);
 
-                ThisThread::sleep_for(300ms);
+                ThisThread::sleep_for(400ms);
 
-                while ((line_count <= 5) &&
-                       (controller.get_reader_code() <= STOP_COUNT))
+                while (line_count <= 5)
                 {
                     if (line_trace.read() == 1)
+                        line_count++;
+
+                    ThisThread::sleep_for(5ms);
+                }
+
+                line_count = 0;
+
+                while (line_count <= 5)
+                {
+                    if (line_trace.read() == 2)
                         line_count++;
 
                     ThisThread::sleep_for(5ms);
@@ -182,8 +187,7 @@ int main()
         bool is_arrived = false;
 
         // ライントレース(直進)のコード
-        while ((controller.get_reader_code() <= STOP_COUNT) &&
-               (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME))
+        while (std::chrono::duration<float>{t.elapsed_time()}.count() < TURN_INTERVAL_TIME)
         {
             if (line_trace.read() == 0)
                 is_arrived = true;
