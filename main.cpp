@@ -257,18 +257,20 @@ int main()
             }
         }
 
-        bool is_arrived = false;
+        int arrived_count = 0;
 
         // ライントレース(直進)のコード
         while (std::chrono::duration<float>{turn_timer.elapsed_time()}.count() <
                TURN_INTERVAL_TIME)
         {
             if (line_trace.read() == 0)
-                is_arrived = true;
+            {
+                arrived_count++;
+            }
 
             Motor motor[2];
 
-            if (is_arrived == true)
+            if (arrived_count >= 5)
             {
                 motor[0].set_state(State::Brake);
                 motor[0].set_duty_cycle(0.00f);
@@ -288,7 +290,7 @@ int main()
             tb6612.set(motor[0], 0);
             tb6612.set(motor[1], 1);
 
-            ThisThread::sleep_for(10ms);
+            ThisThread::sleep_for(5ms);
         }
 
         turn_timer.stop();

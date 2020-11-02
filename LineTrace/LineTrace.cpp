@@ -42,7 +42,7 @@ int LineTrace::read()
     else if (_place[TracePosition::Center] == Place::Base)
     {
         _motor[Left].set_state(State::CCW);
-        _motor[Left].set_duty_cycle(0.20f);
+        _motor[Left].set_duty_cycle(0.30f);
 
         _motor[Right].set_state(State::CW);
         _motor[Right].set_duty_cycle(0.50f);
